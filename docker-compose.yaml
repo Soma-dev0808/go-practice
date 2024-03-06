@@ -1,0 +1,37 @@
+version: "3.3"
+services:
+  mysql:
+    platform: linux/amd64
+    image: mysql:5.7
+    container_name: db-for-go
+
+    # MySQL の設定値を指定
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --sql-mode=ONLY_FULL_GROUP_BY,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+
+    # コンテナ内で使用する環境変数の値を指定
+    environment:
+      MYSQL_ROOT_USER: ${ROOTUSER} # MySQL のルートユーザー名
+      MYSQL_ROOT_PASSWORD: ${ROOTPASS} # MySQL のルートユーザーのパスワード
+      MYSQL_DATABASE: ${DATABASE} # MySQL に用意されている初期データベースの名前
+      MYSQL_USER: ${USERNAME} # MySQL のユーザー名
+      MYSQL_PASSWORD: ${USERPASS} # MySQL のユーザーパスワード
+      TZ: "Asia/Tokyo"
+
+    # コンテナの 3306 番ポートを、ローカルの 3307 番ポートにつなげる
+    # 3306が使用できなかったので3307を使用
+    # ポートがコンテナとホストで違うので-P 3307が必要 => mysql -h 127.0.0.1 -P 3307
+    ports:
+      - "3307:3306"
+
+    # コンテナ内にある MySQL に格納するデータを永続化させるために使用するボリュームを指定
+    volumes:
+      - db-volume:/var/lib/mysql
+
+# ボリュームの作成
+volumes:
+  db-volume:
+# docker-compose up -d
+# docker-compose down -v
